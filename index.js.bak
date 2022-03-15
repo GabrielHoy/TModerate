@@ -1,0 +1,57 @@
+/*
+	Gabriel Hoy
+	3/13/2022
+*/
+const fs = require("fs");
+const Eris = require("eris");
+const request = require('request');
+const ffmpeg = require('ffmpeg');
+const path = require('path');
+
+let token = fs.readFileSync("token.txt").toString().trim();
+
+const bot = new Eris(token);
+
+bot.on("ready", () => {
+	console.log("Bot started");
+});
+
+bot.on("error", (err) => {
+	console.log(err);
+});
+
+function Sleep(ms) {
+	return new Promise((resolve) => {
+		setTimeout(resolve, ms);
+	});
+}
+
+function IsMemberStaff(member) {
+	let isStaff = false;
+	member.roles.forEach((roleId) => {
+		let role = member.guild.roles.find((x) => x.id === roleId)
+		if (role?.name == "Staff") {
+			console.log("IS STAFF");
+			isStaff = true; 
+		}
+	});
+	return isStaff;
+}
+
+function StaffSentMessage(msg) {
+	
+}
+
+bot.on("messageCreate", async (msg) => {
+	if (msg.author.id == bot.user.id) return;
+		try {
+			 
+			 if (IsMemberStaff(msg.member)) {
+				 StaffSentMessage(msg);
+			 }
+		} catch (err) {
+			console.log(err);
+		}
+})
+
+bot.connect();
