@@ -4,24 +4,14 @@
 */
 const fs = require("fs");
 const Eris = require("eris");
-const request = require('request');
+const http = require("http");
 const ffmpeg = require('ffmpeg');
 const path = require('path');
 
 let token = fs.readFileSync("token.txt").toString().trim();
 const bot = new Eris(token);
+let configuration = require("./config.js").config;
 
-let configuration = (() => {
-	try {
-		let configFile = fs.readFileSync("config.json").toString().trim();
-		let config = JSON.parse(configFile);
-		return config;
-	}
-	catch (e) {
-		console.log("ERR CONFIGFILEPARSE");
-		console.log(e);
-	}
-})();
 
 let commands = {}
 
@@ -61,11 +51,13 @@ function IsMemberStaff(member) {
 }
 
 function StaffSentMessage(msg) {
-	let commandComponents = msg.content?.split(" ");
-	let command = commandComponents?.[0];
-	let isCommand = command?.startsWith(configuration.prefix);
+	
+	
+	let isCommand = msg?.content?.startsWith(configuration.prefix);
 	if (isCommand) {
-		command = command.split("-")[1];
+		let cmdMsg = msg.content.substring(configuration.prefix.length);
+		let commandComponents = cmdMsg.split(" ");
+		let command = commandComponents?.[0];
 		if (commands[command]) {
 			let commandOutput = commands[command].Function(msg, bot, commandComponents);
 			if (typeof(commandOutput) == "string") { 
